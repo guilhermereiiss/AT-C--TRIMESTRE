@@ -1,0 +1,106 @@
+@page
+@model AgenciaViagem.Pages.Clientes.IndexModel
+
+<h1>Gerenciar Clientes</h1>
+
+<section class="form-section">
+    <h2>Adicionar Novo Cliente</h2>
+    <form method="post" class="cliente-form">
+        <div class="form-group">
+            <label asp-for="NomeCompleto">Nome Completo:</label>
+            <input asp-for="NomeCompleto" />
+        </div>
+        <div class="form-group">
+            <label asp-for="EnderecoEmail">E-mail:</label>
+            <input asp-for="EnderecoEmail" />
+        </div>
+        <div class="form-group">
+            <label asp-for="NumeroTelefone">Telefone:</label>
+            <input asp-for="NumeroTelefone" />
+        </div>
+        <button type="submit" class="btn-adicionar">Adicionar Cliente</button>
+    </form>
+</section>
+
+<section class="lista-section">
+    <h2>Lista de Clientes</h2>
+    <ul class="cliente-lista">
+        @foreach (var item in Model.Clientes)
+        {
+        <li class="cliente-item">
+            <strong>@item.NomeCompleto</strong> <br />
+             @item.EnderecoEmail <br />
+             @item.NumeroTelefone
+        </li>
+        }
+    </ul>
+</section>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+    }
+
+    h1, h2 {
+        color: #333;
+    }
+
+    .form-section, .lista-section {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .cliente-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"], input[type="email"], input[type="tel"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .btn-adicionar {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-adicionar:hover {
+        background-color: #0056b3;
+    }
+
+    .cliente-lista {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    .cliente-item {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+</style>

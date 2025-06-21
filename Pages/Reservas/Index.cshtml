@@ -1,0 +1,162 @@
+@page
+@model AgenciaViagem.Pages.Reservas.IndexModel
+@using AgenciaViagem.Models
+@{
+    ViewData["Title"] = "Gerenciar Reservas";
+}
+
+<h1>Gerenciar Reservas</h1>
+
+<section class="form-section">
+    <h2>Fazer Nova Reserva</h2>
+    <form method="post" class="reserva-form">
+        <div class="form-group">
+            <label asp-for="Reserva.ClienteId">Cliente:</label>
+            <select asp-for="Reserva.ClienteId" class="form-control">
+                <option value="">Selecione um cliente</option>
+                @foreach (var cliente in Model.Clientes)
+                {
+                <option value="@cliente.ClienteId">@cliente.NomeCompleto</option>
+                }
+            </select>
+            <span asp-validation-for="Reserva.ClienteId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Reserva.PacoteTuristicoId">Pacote Turístico:</label>
+            <select asp-for="Reserva.PacoteTuristicoId" class="form-control">
+                <option value="">Selecione um pacote</option>
+                @foreach (var pacote in Model.PacotesDisponiveis)
+                {
+                <option value="@pacote.PacoteTuristicoId">@pacote.TituloPacote</option>
+                }
+            </select>
+            <span asp-validation-for="Reserva.PacoteTuristicoId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Reserva.NumeroPassageiros">Número de Passageiros:</label>
+            <input asp-for="Reserva.NumeroPassageiros" class="form-control" type="number" />
+            <span asp-validation-for="Reserva.NumeroPassageiros" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Reserva.ObservacoesAdicionais">Observações:</label>
+            <textarea asp-for="Reserva.ObservacoesAdicionais" class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn-adicionar">Fazer Reserva</button>
+    </form>
+</section>
+
+<section class="lista-section">
+    <h2>Lista de Reservas</h2>
+    <table class="tabela-reservas">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Pacote</th>
+                <th>Data da Reserva</th>
+                <th>Passageiros</th>
+                <th>Valor Total</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reserva in Model.Reservas)
+            {
+            <tr>
+                <td>@(reserva.ClienteReservante?.NomeCompleto ?? "N/A")</td>
+                <td>@(reserva.PacoteEscolhido?.TituloPacote ?? "N/A")</td>
+                <td>@reserva.DataHoraReserva.ToString("g")</td>
+                <td>@reserva.NumeroPassageiros</td>
+                <td>@reserva.ValorTotalReserva.ToString("C")</td>
+                <td>@reserva.StatusReserva</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+    }
+
+    h1, h2 {
+        color: #333;
+    }
+
+    .form-section, .lista-section {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .reserva-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .btn-adicionar {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-adicionar:hover {
+        background-color: #0056b3;
+    }
+
+    .tabela-reservas {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .tabela-reservas th, .tabela-reservas td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .tabela-reservas th {
+        background-color: #f1f1f1;
+    }
+
+    .tabela-reservas tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .text-danger {
+        color: red;
+        font-size: 14px;
+    }
+</style>
