@@ -27,10 +27,12 @@
     <ul class="cliente-lista">
         @foreach (var item in Model.Clientes)
         {
-        <li class="cliente-item">
+        <li class="cliente-item" data-cliente-id="@item.ClienteId">
             <strong>@item.NomeCompleto</strong> <br />
             @item.EnderecoEmail <br />
             @item.NumeroTelefone
+            <button class="btn-detalhes" onclick="openDetailsModal(@item.ClienteId, '@item.NomeCompleto', '@item.EnderecoEmail', '@item.NumeroTelefone', '@item.DataCadastro.ToString("g")', '@item.StatusAtivo', '@(item.DataExclusao?.ToString("g") ?? "N/A")')">Detalhes</button>
+            <button class="btn-editar" onclick="openEditModal(@item.ClienteId, '@item.NomeCompleto', '@item.EnderecoEmail', '@item.NumeroTelefone')">Editar</button>
             <form method="post" asp-page-handler="Delete" asp-route-id="@item.ClienteId" style="display:inline;">
                 <button type="submit" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir este cliente?');">Excluir</button>
             </form>
@@ -38,6 +40,103 @@
         }
     </ul>
 </section>
+
+
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="Update">
+                <div class="modal-body">
+                    <input type="hidden" id="editClienteId" name="ClienteId" />
+                    <div class="form-group">
+                        <label for="editNomeCompleto">Nome Completo:</label>
+                        <input type="text" id="editNomeCompleto" name="NomeCompleto" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editEnderecoEmail">E-mail:</label>
+                        <input type="email" id="editEnderecoEmail" name="EnderecoEmail" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editNumeroTelefone">Telefone:</label>
+                        <input type="tel" id="editNumeroTelefone" name="NumeroTelefone" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="detailsClientModal" tabindex="-1" aria-labelledby="detailsClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsClientModalLabel">Detalhes do Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label><strong>Nome Completo:</strong></label>
+                    <p id="detailsNomeCompleto"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>E-mail:</strong></label>
+                    <p id="detailsEnderecoEmail"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>Telefone:</strong></label>
+                    <p id="detailsNumeroTelefone"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>Data de Cadastro:</strong></label>
+                    <p id="detailsDataCadastro"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>Status Ativo:</strong></label>
+                    <p id="detailsStatusAtivo"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>Data de Exclusão:</strong></label>
+                    <p id="detailsDataExclusao"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function openEditModal(clienteId, nomeCompleto, enderecoEmail, numeroTelefone) {
+            $('#editClienteId').val(clienteId);
+            $('#editNomeCompleto').val(nomeCompleto);
+            $('#editEnderecoEmail').val(enderecoEmail);
+            $('#editNumeroTelefone').val(numeroTelefone);
+            $('#editClientModal').modal('show');
+        }
+
+        function openDetailsModal(clienteId, nomeCompleto, enderecoEmail, numeroTelefone, dataCadastro, statusAtivo, dataExclusao) {
+            $('#detailsNomeCompleto').text(nomeCompleto);
+            $('#detailsEnderecoEmail').text(enderecoEmail);
+            $('#detailsNumeroTelefone').text(numeroTelefone);
+            $('#detailsDataCadastro').text(dataCadastro);
+            $('#detailsStatusAtivo').text(statusAtivo === 'True' ? 'Ativo' : 'Inativo');
+            $('#detailsDataExclusao').text(dataExclusao);
+            $('#detailsClientModal').modal('show');
+        }
+    </script>
+}
 
 <style>
     body {
@@ -92,6 +191,40 @@
             background-color: #0056b3;
         }
 
+    .btn-editar {
+        background-color: #ffc107;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+        margin-left: 10px;
+    }
+
+        .btn-editar:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-detalhes {
+        background-color: #17a2b8;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+        margin-left: 10px;
+    }
+
+        .btn-detalhes:hover {
+            background-color: #138496;
+        }
+
     .btn-excluir {
         background-color: #dc3545;
         color: white;
@@ -101,7 +234,6 @@
         text-decoration: none;
         font-size: 14px;
         cursor: pointer;
-        urial, sans-serif;
         transition: background-color 0.3s, color 0.3s;
         margin-left: 10px;
     }

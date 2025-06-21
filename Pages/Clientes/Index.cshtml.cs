@@ -27,9 +27,14 @@ namespace AgenciaViagem.Pages.Clientes
         [BindProperty]
         public string NumeroTelefone { get; set; }
 
+        [BindProperty]
+        public int ClienteId { get; set; }
+
         public async Task OnGetAsync()
         {
-            Clientes = await _context.Clientes.ToListAsync();
+            Clientes = await _context.Clientes
+                .Where(c => c.StatusAtivo == true)
+                .ToListAsync();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -54,14 +59,42 @@ namespace AgenciaViagem.Pages.Clientes
             return RedirectToPage();
         }
 
+        public async Task<IActionResult> OnPostUpdateAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                Clientes = await _context.Clientes
+                    .Where(c => c.StatusAtivo == true)
+                    .ToListAsync();
+                return Page();
+            }
+
+            var cliente = await _context.Clientes.FindAsync(ClienteId);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            cliente.NomeCompleto = NomeCompleto;
+            cliente.EnderecoEmail = EnderecoEmail;
+            cliente.NumeroTelefone = NumeroTelefone;
+
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente != null)
+            if (cliente == null)
             {
-                _context.Clientes.Remove(cliente);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            cliente.StatusAtivo = false;
+            cliente.DataExclusao = DateTime.Now;
+            await _context.SaveChangesAsync();
+
             return RedirectToPage();
         }
     }

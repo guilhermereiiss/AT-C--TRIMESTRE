@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace AgenciaViagem.Pages.Reservas
 {
@@ -44,9 +45,9 @@ namespace AgenciaViagem.Pages.Reservas
                 .Where(p => p.StatusAtivo && p.DataPartida > DateTime.Now)
                 .ToListAsync();
 
-            // Filter packages with available slots on the client side
+            // Filter packages with available slots
             PacotesDisponiveis = PacotesDisponiveis
-                .Where(p => p.CapacidadeMaximaViajantes - 
+                .Where(p => p.CapacidadeMaximaViajantes -
                             (p.ReservasEfetuadas?.Count(r => r.StatusReserva == "Confirmada") ?? 0) > 0)
                 .ToList();
         }
@@ -59,10 +60,10 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Business Rule: Check if client already has a reservation for this package
+            // Check if client already has a reservation for this package
             var existingReserva = await _context.Reservas
-                .AnyAsync(r => r.ClienteId == Reserva.ClienteId && 
-                               r.PacoteTuristicoId == Reserva.PacoteTuristicoId && 
+                .AnyAsync(r => r.ClienteId == Reserva.ClienteId &&
+                               r.PacoteTuristicoId == Reserva.PacoteTuristicoId &&
                                r.StatusReserva == "Confirmada");
 
             if (existingReserva)
@@ -84,8 +85,8 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Business Rule: Check available capacity
-            var vagasDisponiveis = pacote.CapacidadeMaximaViajantes - 
+            // Check available capacity
+            var vagasDisponiveis = pacote.CapacidadeMaximaViajantes -
                                   (pacote.ReservasEfetuadas?.Count(r => r.StatusReserva == "Confirmada") ?? 0);
             if (Reserva.NumeroPassageiros > vagasDisponiveis)
             {
@@ -94,17 +95,26 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Calculate total value
-            Reserva.ValorTotalReserva = Reserva.NumeroPassageiros * pacote.ValorPorPessoa;
+            // Calculate total value using lambda
+            Func<int, decimal, decimal> calculateTotal = (pass, price) => pass * price;
+            Reserva.ValorTotalReserva = calculateTotal(Reserva.NumeroPassageiros, pacote.ValorPorPessoa);
             Reserva.DataHoraReserva = DateTime.Now;
-            Reserva.StatusReserva = "Confirmada"; // Assuming immediate confirmation for simplicity
-            Reserva.DescontoAplicado = 0; // No discounts for now
+            Reserva.StatusReserva = "Confirmada";
+            Reserva.DescontoAplicado = 0;
 
             _context.Reservas.Add(Reserva);
             await _context.SaveChangesAsync();
 
             // Check capacity limit
             pacote.VerificarCapacidadeDisponivel();
+
+            // Pass calculation details to TempData
+            TempData["CalculationData"] = JsonConvert.SerializeObject(new
+            {
+                numeroPassageiros = Reserva.NumeroPassageiros,
+                valorPorPessoa = pacote.ValorPorPessoa,
+                valorTotal = Reserva.ValorTotalReserva
+            });
 
             return RedirectToPage();
         }
@@ -121,7 +131,7 @@ namespace AgenciaViagem.Pages.Reservas
                 .ToListAsync();
 
             PacotesDisponiveis = PacotesDisponiveis
-                .Where(p => p.CapacidadeMaximaViajantes - 
+                .Where(p => p.CapacidadeMaximaViajantes -
                             (p.ReservasEfetuadas?.Count(r => r.StatusReserva == "Confirmada") ?? 0) > 0)
                 .ToList();
         }
