@@ -33,9 +33,7 @@
             @item.NumeroTelefone
             <button class="btn-detalhes" onclick="openDetailsModal(@item.ClienteId, '@item.NomeCompleto', '@item.EnderecoEmail', '@item.NumeroTelefone', '@item.DataCadastro.ToString("g")', '@item.StatusAtivo', '@(item.DataExclusao?.ToString("g") ?? "N/A")')">Detalhes</button>
             <button class="btn-editar" onclick="openEditModal(@item.ClienteId, '@item.NomeCompleto', '@item.EnderecoEmail', '@item.NumeroTelefone')">Editar</button>
-            <form method="post" asp-page-handler="Delete" asp-route-id="@item.ClienteId" style="display:inline;">
-                <button type="submit" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir este cliente?');">Excluir</button>
-            </form>
+            <button class="btn-excluir" onclick="removeClientFromUI(@item.ClienteId)">Excluir</button>
         </li>
         }
     </ul>
@@ -67,13 +65,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alteraï¿½ï¿½es</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="detailsClientModal" tabindex="-1" aria-labelledby="detailsClientModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -104,7 +101,7 @@
                     <p id="detailsStatusAtivo"></p>
                 </div>
                 <div class="form-group">
-                    <label><strong>Data de Exclusão:</strong></label>
+                    <label><strong>Data de Exclusï¿½o:</strong></label>
                     <p id="detailsDataExclusao"></p>
                 </div>
             </div>
@@ -134,6 +131,27 @@
             $('#detailsStatusAtivo').text(statusAtivo === 'True' ? 'Ativo' : 'Inativo');
             $('#detailsDataExclusao').text(dataExclusao);
             $('#detailsClientModal').modal('show');
+        }
+
+        function removeClientFromUI(clienteId) {
+            if (confirm('Tem certeza que deseja excluir este cliente da lista?')) {
+                $(`li[data-cliente-id="${clienteId}"]`).remove();
+
+                $.ajax({
+                    url: '/Clientes/Index?handler=Delete',
+                    type: 'POST',
+                    data: { id: clienteId },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function () {
+                        console.log('Cliente marcado como inativo no backend.');
+                    },
+                    error: function () {
+                        console.error('Erro ao marcar cliente como inativo.');
+                    }
+                });
+            }
         }
     </script>
 }
@@ -175,7 +193,7 @@
         box-sizing: border-box;
     }
 
-    .btn-adicionar {
+    .btn-adicionar, .btn-entrar {
         background-color: #007bff;
         color: white;
         padding: 10px 20px;
@@ -187,7 +205,7 @@
         transition: background-color 0.3s, color 0.3s;
     }
 
-        .btn-adicionar:hover {
+        .btn-adicionar:hover, .btn-entrar:hover {
             background-color: #0056b3;
         }
 
