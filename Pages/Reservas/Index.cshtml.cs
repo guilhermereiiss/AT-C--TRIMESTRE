@@ -60,7 +60,7 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Business Rule: Check if client already has a reservation for this package
+          
             var existingReserva = await _context.Reservas
                 .AnyAsync(r => r.ClienteId == Reserva.ClienteId &&
                                r.PacoteTuristicoId == Reserva.PacoteTuristicoId &&
@@ -85,7 +85,7 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Business Rule: Check available capacity
+            
             var vagasDisponiveis = pacote.CapacidadeMaximaViajantes - 
                                   (pacote.ReservasEfetuadas?.Count(r => r.StatusReserva == "Confirmada") ?? 0);
             if (Reserva.NumeroPassageiros > vagasDisponiveis)
@@ -95,18 +95,17 @@ namespace AgenciaViagem.Pages.Reservas
                 return Page();
             }
 
-            // Calculate total value
+            
             Reserva.ValorTotalReserva = Reserva.NumeroPassageiros * pacote.ValorPorPessoa;
             Reserva.DataHoraReserva = DateTime.Now;
-            Reserva.StatusReserva = "Confirmada"; // Assuming immediate confirmation for simplicity
-            Reserva.DescontoAplicado = 0; // No discounts for now
+            Reserva.StatusReserva = "Confirmada"; 
+            Reserva.DescontoAplicado = 0;
 
             _context.Reservas.Add(Reserva);
             await _context.SaveChangesAsync();
 
             pacote.VerificarCapacidadeDisponivel();
 
-            // Pass calculation details to TempData
             TempData["CalculationData"] = JsonConvert.SerializeObject(new
             {
                 numeroPassageiros = Reserva.NumeroPassageiros,
