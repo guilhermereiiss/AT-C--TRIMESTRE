@@ -132,6 +132,4 @@ https://localhost:5001
 
 Guilherme Reis
 
----
 
-Se quiser, posso gerar o arquivo `README.md` pronto para você baixar. Quer?
