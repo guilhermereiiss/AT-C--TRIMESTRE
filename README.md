@@ -1,4 +1,5 @@
 
+## LOGIN: Admin / SENHA: 12345
 
 <p align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/.NET_Core_Logo.svg" width="120" alt="Logo .NET" />
