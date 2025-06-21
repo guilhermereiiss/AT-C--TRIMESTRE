@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using AgenciaViagem.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AgenciaViagem.Pages.Clientes
 {
@@ -14,14 +16,16 @@ namespace AgenciaViagem.Pages.Clientes
             _context = context;
         }
 
-        public IList<Cliente> Clientes { get; set; } = default!; 
+        public IList<Cliente> Clientes { get; set; }
 
         [BindProperty]
-        public string NomeCompleto { get; set; } = string.Empty;
+        public string NomeCompleto { get; set; }
+
         [BindProperty]
-        public string EnderecoEmail { get; set; } = string.Empty;
+        public string EnderecoEmail { get; set; }
+
         [BindProperty]
-        public string NumeroTelefone { get; set; } = string.Empty;
+        public string NumeroTelefone { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -30,15 +34,32 @@ namespace AgenciaViagem.Pages.Clientes
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!string.IsNullOrEmpty(NomeCompleto))
+            if (!ModelState.IsValid)
             {
-                var cliente = new Cliente
-                {
-                    NomeCompleto = NomeCompleto,
-                    EnderecoEmail = EnderecoEmail,
-                    NumeroTelefone = NumeroTelefone
-                };
-                _context.Clientes.Add(cliente);
+                return Page();
+            }
+
+            var novoCliente = new Cliente
+            {
+                NomeCompleto = NomeCompleto,
+                EnderecoEmail = EnderecoEmail,
+                NumeroTelefone = NumeroTelefone,
+                DataCadastro = DateTime.Now,
+                StatusAtivo = true
+            };
+
+            _context.Clientes.Add(novoCliente);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var cliente = await _context.Clientes.FindAsync(id);
+            if (cliente != null)
+            {
+                _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
             }
             return RedirectToPage();

@@ -29,8 +29,11 @@
         {
         <li class="cliente-item">
             <strong>@item.NomeCompleto</strong> <br />
-             @item.EnderecoEmail <br />
-             @item.NumeroTelefone
+            @item.EnderecoEmail <br />
+            @item.NumeroTelefone
+            <form method="post" asp-page-handler="Delete" asp-route-id="@item.ClienteId" style="display:inline;">
+                <button type="submit" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir este cliente?');">Excluir</button>
+            </form>
         </li>
         }
     </ul>
@@ -85,9 +88,27 @@
         transition: background-color 0.3s, color 0.3s;
     }
 
-    .btn-adicionar:hover {
-        background-color: #0056b3;
+        .btn-adicionar:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-excluir {
+        background-color: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        urial, sans-serif;
+        transition: background-color 0.3s, color 0.3s;
+        margin-left: 10px;
     }
+
+        .btn-excluir:hover {
+            background-color: #c82333;
+        }
 
     .cliente-lista {
         list-style-type: none;
@@ -102,5 +123,4 @@
         border-radius: 5px;
         margin-bottom: 10px;
     }
-
 </style>
